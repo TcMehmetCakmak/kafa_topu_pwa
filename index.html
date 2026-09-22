@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kafa Topu">
+
+    <meta name="description"
+          content="HTML, CSS ve JavaScript ile geliştirilmiş Kafa Topu oyunu.">
+
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="icon"
+          type="image/svg+xml"
+          href="icons/icon-192.svg">
+
+    <title>Kafa Topu</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="game-wrapper">
+
+    <!-- ÜST MENÜ -->
+    <header class="top-bar">
+
+        <div class="logo">
+            ⚽ Kafa Topu
+        </div>
+
+        <button id="installBtn" class="install-btn">
+            📲 Yükle
+        </button>
+
+    </header>
+
+
+    <!-- SKOR -->
+    <section class="score-board">
+
+        <div class="team">
+            <span>OYUNCU</span>
+            <strong id="playerScore">0</strong>
+        </div>
+
+        <div class="timer">
+            <span id="timer">60</span>
+            <small>SN</small>
+        </div>
+
+        <div class="team">
+            <span>RAKİP</span>
+            <strong id="enemyScore">0</strong>
+        </div>
+
+    </section>
+
+
+    <!-- OYUN ALANI -->
+    <main class="game-container">
+
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- BAŞLANGIÇ EKRANI -->
+        <div id="startScreen" class="overlay">
+
+            <div class="menu-card">
+
+                <div class="big-ball">⚽</div>
+
+                <h1>Kafa Topu</h1>
+
+                <p>
+                    Rakibine karşı gol at!
+                </p>
+
+                <button id="startButton" class="main-button">
+                    ▶ Oyuna Başla
+                </button>
+
+                <div class="controls-info">
+
+                    <div>
+                        <b>PC</b>
+                        <br>
+                        A / D → Hareket
+                        <br>
+                        W / ↑ → Zıpla
+                    </div>
+
+                    <div>
+                        <b>Mobil</b>
+                        <br>
+                        Ekrandaki tuşları kullan
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- OYUN SONU -->
+        <div id="gameOverScreen" class="overlay hidden">
+
+            <div class="menu-card">
+
+                <div class="big-ball">🏆</div>
+
+                <h1 id="gameResult">
+                    Maç Bitti
+                </h1>
+
+                <p id="finalScore">
+                    0 - 0
+                </p>
+
+                <button id="restartButton" class="main-button">
+                    🔄 Tekrar Oyna
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- MOBİL KONTROLLER -->
+    <section class="mobile-controls">
+
+        <div class="movement-controls">
+
+            <button
+                id="leftButton"
+                class="control-button">
+                ◀
+            </button>
+
+            <button
+                id="rightButton"
+                class="control-button">
+                ▶
+            </button>
+
+        </div>
+
+        <button
+            id="jumpButton"
+            class="jump-button">
+            🦘
+        </button>
+
+    </section>
+
+
+    <!-- ALT BİLGİ -->
+    <footer>
+
+        <span>
+            Kafa Topu PWA
+        </span>
+
+        <span>
+            HTML • CSS • JavaScript
+        </span>
+
+    </footer>
+
+</div>
+
+<script src="game.js"></script>
+
+<script>
+
+let deferredPrompt;
+
+const installBtn =
+    document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (event) => {
+
+    event.preventDefault();
+
+    deferredPrompt = event;
+
+    installBtn.style.display = "block";
+
+});
+
+
+installBtn.addEventListener("click", async () => {
+
+    if (!deferredPrompt) {
+        alert("Bu uygulama zaten yüklü olabilir veya tarayıcınız PWA kurulumunu desteklemiyor.");
+        return;
+    }
+
+    deferredPrompt.prompt();
+
+    await deferredPrompt.userChoice;
+
+    deferredPrompt = null;
+
+    installBtn.style.display = "none";
+
+});
+
+
+window.addEventListener("appinstalled", () => {
+
+    installBtn.style.display = "none";
+
+});
+
+
+/* SERVICE WORKER */
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+        navigator.serviceWorker
+            .register("sw.js")
+            .then(() => {
+                console.log("Service Worker aktif.");
+            })
+            .catch(error => {
+                console.error(
+                    "Service Worker hatası:",
+                    error
+                );
+            });
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
